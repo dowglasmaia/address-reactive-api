@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: MS Address API
+  description: |
+    This API provides operations related to client addresses. It follows the OpenAPI 3.0 specification.
+  contact:
+    email: dowglasmaia@live.com
+  version: 1.0.0
+tags:
+  - name: Client
+    description: Operations related to client addresses
+paths:
+  /address/findByClientById:
+    get:
+      tags:
+        - Client
+      summary: Find Address by Client ID
+      description: Retrieve the address of a client by their ID.
+      operationId: findByClientById
+      parameters:
+        - name: clientId
+          in: query
+          description: ID of the client to retrieve the address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+        '404':
+          description: Address not found
+        '500':
+          description: Internal server error
+        '503':
+          description: Service unavailable
+  /address:
+    post:
+      tags:
+        - Client
+      summary: Create Address
+      description: Create a new address for a client.
+      operationId: createAddress
+      parameters:
+        - name: clientId
+          in: query
+          description: ID of the client to which the address will be linked
+          required: true
+          schema:
+            type: string
+            example: 123456
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        '201':
+          description: Address created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+        '400':
+          description: Invalid request body or parameters
+        '500':
+          description: Internal server error
+        '503':
+          description: Service unavailable
+components:
+  schemas:
+    AddressRequest:
+      type: object
+      properties:
+        street:
+          type: string
+          description: Street address
+          example: 437 Lytton Ave
+        number:
+          type: string
+          description: Street number
+          example: 437
+        city:
+          type: string
+          description: City
+          example: Palo Alto
+        state:
+          type: string
+          description: State abbreviation
+          enum: [AM, MA, SC, PR, PI]  # Definindo o campo state como um enum com opções específicas
+          example: AM
+        zip:
+          type: string
+          description: ZIP code
+          example: '94301'
+    AddressResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the address
+        street:
+          type: string
+          description: Street address
+          example: 437 Lytton Ave
+        number:
+          type: string
+          description: Street number
+          example: 437
+        city:
+          type: string
+          description: City
+          example: Palo Alto
+        state:
+          type: string
+          description: State abbreviation
+          example: CA
+        zip:
+          type: string
+          description: ZIP code
+          example: '94301'
