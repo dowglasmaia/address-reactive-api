@@ -7,20 +7,20 @@ info:
     email: dowglasmaia@live.com
   version: 1.0.0
 tags:
-  - name: Client
+  - name: Address
     description: Operations related to client addresses
 paths:
-  /addresses/findByClientById:
+  /addresses/findByZipCode:
     get:
       tags:
-        - Client
-      summary: Find Address by Client ID
+        - Address
+      summary: Find Address by Zipcode
       description: Retrieve the address of a client by their ID.
-      operationId: findByClientById
+      operationId: findByZipCode
       parameters:
-        - name: clientId
+        - name: zipCode
           in: query
-          description: ID of the client to retrieve the address
+          description: ZipCodeID of the Address
           required: true
           schema:
             type: string
@@ -40,18 +40,10 @@ paths:
   /addresses:
     post:
       tags:
-        - Client
+        - Address
       summary: Create Address
-      description: Create a new address for a client.
+      description: Create a new address.
       operationId: createAddress
-      parameters:
-        - name: clientId
-          in: query
-          description: ID of the client to which the address will be linked
-          required: true
-          schema:
-            type: string
-            example: 123456
       requestBody:
         required: true
         content:

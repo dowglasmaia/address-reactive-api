@@ -6,7 +6,6 @@ import br.com.dowglasmaia.openapi.model.AddressRequest;
 import br.com.dowglasmaia.openapi.model.AddressResponse;
 import com.dowglasmaia.address.api.service.AddressService;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +20,11 @@ import reactor.core.publisher.Mono;
 public class AddressController implements AddressesApi {
     @Autowired
     private AddressService service;
-    @Override
-    public Mono<ResponseEntity<AddressIdResponse>> createAddress(
-            String clientId,
-            Mono<AddressRequest> addressRequest,
-            ServerWebExchange exchange) {
-        log.info("Start endpoint createAddress");
 
+    @Override
+    public Mono<ResponseEntity<AddressIdResponse>> createAddress(Mono<AddressRequest> addressRequest, ServerWebExchange exchange) {
+        log.info("Start endpoint createAddress");
         return addressRequest
-                .log()
                 .flatMap(request -> {
                     log.info("Body Request: {}", addressRequest);
                     return service.insert(request)
@@ -38,11 +33,12 @@ public class AddressController implements AddressesApi {
     }
 
     @Override
-    public Mono<ResponseEntity<AddressResponse>> findByClientById(
-            String clientId,
-            ServerWebExchange exchange) {
-        log.info("Start endpoint findByClientById");
-
-        throw new NotImplementedException();
+    public Mono<ResponseEntity<AddressResponse>> findByZipCode(String zipCode, ServerWebExchange exchange) {
+        log.info("Start endpoint findByZipCode");
+        return service.findByZipCode(zipCode)
+                .flatMap(addressResponse -> Mono.just(ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(addressResponse)));
     }
+
 }

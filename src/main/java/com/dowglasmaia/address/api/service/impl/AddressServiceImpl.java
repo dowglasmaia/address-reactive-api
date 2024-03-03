@@ -2,6 +2,7 @@ package com.dowglasmaia.address.api.service.impl;
 
 import br.com.dowglasmaia.openapi.model.AddressIdResponse;
 import br.com.dowglasmaia.openapi.model.AddressRequest;
+import br.com.dowglasmaia.openapi.model.AddressResponse;
 import com.dowglasmaia.address.api.document.AddressDocument;
 import com.dowglasmaia.address.api.repository.AddressRepository;
 import com.dowglasmaia.address.api.service.AddressService;
@@ -20,11 +21,19 @@ public class AddressServiceImpl implements AddressService {
     private AddressMapper mapper;
     @Override
     public Mono<AddressIdResponse> insert(AddressRequest request) {
-        log.info("Start Method insert with Address");
+        log.info("Start Method insert Address");
 
         AddressDocument documentRequest = mapper.toAddressDocument(request);
         return repository.save(documentRequest).map(
                 saveDocument -> new AddressIdResponse().id(saveDocument.getId())
         );
+    }
+
+    @Override
+    public Mono<AddressResponse> findByZipCode(String zipCode) {
+        log.info("Start Method findByZipCode with zipCode: {}",zipCode);
+
+        return repository.findByZip(zipCode)
+                .map( document -> mapper.toAddressResponse(document));
     }
 }
