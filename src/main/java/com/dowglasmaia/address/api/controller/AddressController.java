@@ -24,12 +24,10 @@ public class AddressController implements AddressesApi {
     @Override
     public Mono<ResponseEntity<AddressIdResponse>> createAddress(Mono<AddressRequest> addressRequest, ServerWebExchange exchange) {
         log.info("Start endpoint createAddress");
-        return addressRequest
-                .flatMap(request -> {
-                    log.info("Body Request: {}", addressRequest);
-                    return service.insert(request)
-                            .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
-                });
+        return service.insert(addressRequest)
+                .map(response -> ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(response));
     }
 
     @Override
@@ -40,5 +38,20 @@ public class AddressController implements AddressesApi {
                         .status(HttpStatus.OK)
                         .body(addressResponse)));
     }
+
+    @Override
+    public Mono<ResponseEntity<AddressResponse>> updateAddress(String addressId, Mono<AddressRequest> addressRequest, ServerWebExchange exchange) {
+        log.info("Start endpoint updateAddress");
+        return service.update(addressRequest, addressId)
+                .flatMap(addressResponse -> Mono.just(ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(addressResponse)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> deleteAddress(String addressId, ServerWebExchange exchange) {
+        return null;
+    }
+
 
 }

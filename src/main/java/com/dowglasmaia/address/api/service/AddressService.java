@@ -7,9 +7,13 @@ import reactor.core.publisher.Mono;
 
 public interface AddressService {
 
-    Mono<AddressIdResponse> insert(AddressRequest request);
+    Mono<AddressIdResponse> insert(Mono<AddressRequest> request);
 
     Mono<AddressResponse> findByZipCode(String zipCode);
+
+    Mono<AddressResponse> update(Mono<AddressRequest> request, String addressId);
+
+    Mono<Void>delete(String addressId);
 
 
 }

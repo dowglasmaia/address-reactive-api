@@ -19,21 +19,46 @@ public class AddressServiceImpl implements AddressService {
     private AddressRepository repository;
     @Autowired
     private AddressMapper mapper;
-    @Override
-    public Mono<AddressIdResponse> insert(AddressRequest request) {
-        log.info("Start Method insert Address");
 
-        AddressDocument documentRequest = mapper.toAddressDocument(request);
-        return repository.save(documentRequest).map(
-                saveDocument -> new AddressIdResponse().id(saveDocument.getId())
-        );
+    @Override
+    public Mono<AddressIdResponse> insert(Mono<AddressRequest> request) {
+        log.info("Start Method insert Address");
+        return request.flatMap(requestMapper -> {
+                    AddressDocument requestDocument = mapper.toAddressDocument(requestMapper);
+                    return repository.save(requestDocument);
+                })
+                .map(saveDocument -> new AddressIdResponse().id(saveDocument.getId()));
     }
 
     @Override
     public Mono<AddressResponse> findByZipCode(String zipCode) {
-        log.info("Start Method findByZipCode with zipCode: {}",zipCode);
+        log.info("Start Method findByZipCode with zipCode: {}", zipCode);
 
         return repository.findByZip(zipCode)
-                .map( document -> mapper.toAddressResponse(document));
+                .map(document -> mapper.toAddressResponse(document));
+    }
+
+    @Override
+    public Mono<AddressResponse> update(Mono<AddressRequest> request, String addressId) {
+        return request.flatMap(requestMap ->
+                repository.findById(addressId)
+                        .switchIfEmpty(Mono.error(new RuntimeException("Address not found for update")))
+                        .flatMap(document -> {
+                            document.setStreet(requestMap.getStreet());
+                            document.setNumber(requestMap.getNumber());
+                            document.setCity(requestMap.getCity());
+                            document.setState(requestMap.getState().getValue());
+                            document.setZip(requestMap.getZip());
+
+                            return repository.save(document);
+                        })
+                        .map(mapper::toAddressResponse)
+                        .onErrorResume(error -> Mono.error(new RuntimeException("Error during update", error)))
+        );
+    }
+
+    @Override
+    public Mono<Void> delete(String addressId) {
+        return null;
     }
 }
