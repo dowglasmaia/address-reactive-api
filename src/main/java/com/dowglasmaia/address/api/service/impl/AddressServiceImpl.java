@@ -59,6 +59,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Mono<Void> delete(String addressId) {
-        return null;
+        return repository.findById(addressId)
+                .flatMap(addressDocument -> repository.deleteById(addressId))
+                .onErrorResume(error -> Mono.error(new RuntimeException("Error during delete", error)));
     }
 }

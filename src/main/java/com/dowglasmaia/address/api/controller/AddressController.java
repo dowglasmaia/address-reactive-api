@@ -50,7 +50,10 @@ public class AddressController implements AddressesApi {
 
     @Override
     public Mono<ResponseEntity<Void>> deleteAddress(String addressId, ServerWebExchange exchange) {
-        return null;
+        return service.delete(addressId)
+                .then(Mono.just(ResponseEntity
+                        .status(HttpStatus.NO_CONTENT)
+                        .build()));
     }
 
 
