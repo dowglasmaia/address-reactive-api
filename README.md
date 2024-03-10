@@ -20,3 +20,7 @@ The following guides illustrate how to use some features concretely:
 * [Validation](https://spring.io/guides/gs/validating-form-input/)
 * [Messaging with Redis](https://spring.io/guides/gs/messaging-redis/)
 
+### JAEGER
+
+* [https://www.jaegertracing.io/](https://www.jaegertracing.io/docs/1.54/getting-started/)
+

@@ -8,8 +8,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories
 public class AddressReactiveApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AddressReactiveApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AddressReactiveApiApplication.class, args);
+
+    }
 
 }
