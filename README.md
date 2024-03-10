@@ -20,7 +20,19 @@ The following guides illustrate how to use some features concretely:
 * [Validation](https://spring.io/guides/gs/validating-form-input/)
 * [Messaging with Redis](https://spring.io/guides/gs/messaging-redis/)
 
-### JAEGER
+### ZIPKIN
+* [https://zipkin.io/](https://zipkin.io/)
 
-* [https://www.jaegertracing.io/](https://www.jaegertracing.io/docs/1.54/getting-started/)
+### Promethes
+* [prometheus.io](https://prometheus.io/docs/prometheus/latest/getting_started/)
 
+### Actuator
+* [Spring Boot Actuator - Metrics](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html?query=health%27%20target=_blank%3E%3Cb%3Ehealth%3C/b%3E%3C/a%3E-groups#actuator.metrics)
+
+### Micrometer
+* [micrometer.io](https://micrometer.io/)
+
+### grafana
+* [grafana.com](https://grafana.com/grafana/)
+* [grafana.com/docs/setup/docker](https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/)
+* [grafana-resilience4j](https://resilience4j.readme.io/docs/grafana-1)

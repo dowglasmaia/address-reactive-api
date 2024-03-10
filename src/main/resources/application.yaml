@@ -9,6 +9,20 @@ management:
   tracing:
     sampling:
       probability: 1
+  endpoints:
+    enabled-by-default: false #desabilita o default do coletor
+    web:
+      exposure:
+        include: 'health,metrics,prometheus'
+        #include: '*' # mostra dos os endpoints que pertencem ao actuator só sera visiveis com o  enabled-by-default: true
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
 
 logging:
   pattern:
