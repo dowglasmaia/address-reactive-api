@@ -1,13 +1,4 @@
 version: "3.3"
-
-networks:
-  maia-network:
-    driver: bridge
-
-volumes:
-  prometheus_data:
-  grafana-data:
-
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -24,3 +15,12 @@ services:
       - 3000:3000
     networks:
       - maia-network
+
+volumes:
+  prometheus_data:
+  grafana-data:
+
+networks:
+  maia-network:
+    driver: bridge
+
