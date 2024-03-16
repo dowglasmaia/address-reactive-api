@@ -4,6 +4,9 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/address
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
 
 management:
   tracing:
@@ -13,8 +16,8 @@ management:
     enabled-by-default: false #desabilita o default do coletor
     web:
       exposure:
-        include: 'health,metrics,prometheus'
-        #include: '*' # mostra dos os endpoints que pertencem ao actuator só sera visiveis com o  enabled-by-default: true
+        #include: 'health,metrics,prometheus'
+        include: '*' # mostra dos os endpoints que pertencem ao actuator só sera visiveis com o  enabled-by-default: true
   endpoint:
     health:
       enabled: true

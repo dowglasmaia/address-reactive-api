@@ -7,6 +7,7 @@ import com.dowglasmaia.address.api.document.AddressDocument;
 import com.dowglasmaia.address.api.repository.AddressRepository;
 import com.dowglasmaia.address.api.service.AddressService;
 import com.dowglasmaia.address.api.service.mapper.AddressMapper;
+import io.micrometer.observation.annotation.Observed;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class AddressServiceImpl implements AddressService {
     private AddressMapper mapper;
 
     @Override
+    @Observed(name = "insert.address")
     public Mono<AddressIdResponse> insert(Mono<AddressRequest> request) {
         log.info("Start Method insert Address");
         return request.flatMap(requestMapper -> {
@@ -31,6 +33,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Observed(name = "find.byZipCode")
     public Mono<AddressResponse> findByZipCode(String zipCode) {
         log.info("Start Method findByZipCode with zipCode: {}", zipCode);
 
