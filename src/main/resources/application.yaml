@@ -5,6 +5,8 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/address
   elasticsearch:
+    hosts: localhost:9200
+    cluster-name: docker-cluster
     rest:
       uris: http://localhost:9200
 
@@ -28,6 +30,8 @@ management:
       enabled: true
 
 logging:
+  file:
+    name: logs/address-service.log
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 
