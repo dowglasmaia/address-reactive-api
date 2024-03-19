@@ -23,8 +23,8 @@ public class AddressController implements AddressesApi {
 
     @Override
     public Mono<ResponseEntity<AddressIdResponse>> createAddress(Mono<AddressRequest> addressRequest, ServerWebExchange exchange) {
-        log.info("Start endpoint createAddress");
         return service.insert(addressRequest)
+                .doFirst(() -> log.info("Start endpoint createAddress"))
                 .map(response -> ResponseEntity
                         .status(HttpStatus.CREATED)
                         .body(response));
@@ -32,8 +32,8 @@ public class AddressController implements AddressesApi {
 
     @Override
     public Mono<ResponseEntity<AddressResponse>> findByZipCode(String zipCode, ServerWebExchange exchange) {
-        log.info("Start endpoint findByZipCode");
         return service.findByZipCode(zipCode)
+                .doFirst(() -> log.info("Start endpoint findByZipCode"))
                 .flatMap(addressResponse -> Mono.just(ResponseEntity
                         .status(HttpStatus.OK)
                         .body(addressResponse)));
@@ -41,8 +41,8 @@ public class AddressController implements AddressesApi {
 
     @Override
     public Mono<ResponseEntity<AddressResponse>> updateAddress(String addressId, Mono<AddressRequest> addressRequest, ServerWebExchange exchange) {
-        log.info("Start endpoint updateAddress");
         return service.update(addressRequest, addressId)
+                .doFirst(() -> log.info("Start endpoint updateAddress"))
                 .flatMap(addressResponse -> Mono.just(ResponseEntity
                         .status(HttpStatus.OK)
                         .body(addressResponse)));
@@ -51,10 +51,9 @@ public class AddressController implements AddressesApi {
     @Override
     public Mono<ResponseEntity<Void>> deleteAddress(String addressId, ServerWebExchange exchange) {
         return service.delete(addressId)
+                .doFirst(() -> log.info("Start endpoint delete"))
                 .then(Mono.just(ResponseEntity
                         .status(HttpStatus.NO_CONTENT)
                         .build()));
     }
-
-
 }

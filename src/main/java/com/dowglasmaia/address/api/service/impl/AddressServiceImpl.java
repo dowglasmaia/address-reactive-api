@@ -4,6 +4,8 @@ import br.com.dowglasmaia.openapi.model.AddressIdResponse;
 import br.com.dowglasmaia.openapi.model.AddressRequest;
 import br.com.dowglasmaia.openapi.model.AddressResponse;
 import com.dowglasmaia.address.api.document.AddressDocument;
+import com.dowglasmaia.address.api.integration.ViaCepApiIntegration;
+import com.dowglasmaia.address.api.integration.model.ViaCpeModel;
 import com.dowglasmaia.address.api.repository.AddressRepository;
 import com.dowglasmaia.address.api.service.AddressService;
 import com.dowglasmaia.address.api.service.mapper.AddressMapper;
@@ -21,49 +23,71 @@ public class AddressServiceImpl implements AddressService {
     @Autowired
     private AddressMapper mapper;
 
+    @Autowired
+    private ViaCepApiIntegration cepApiIntegration;
+
     @Override
     @Observed(name = "insert.address")
     public Mono<AddressIdResponse> insert(Mono<AddressRequest> request) {
-        log.info("Start Method insert Address");
-        return request.flatMap(requestMapper -> {
-                    AddressDocument requestDocument = mapper.toAddressDocument(requestMapper);
-                    return repository.save(requestDocument);
-                })
-                .map(saveDocument -> new AddressIdResponse().id(saveDocument.getId()));
+        return request
+                .doFirst(() -> log.info("Start Method insert Address"))
+                .flatMap(addressRequest -> cepApiIntegration.getAddressByZipCode(addressRequest.getZip())
+                        .flatMap(this::toAddressDocument)
+                        .flatMap(repository::save)
+                        .map(savedDocument -> new AddressIdResponse().id(savedDocument.getId()))
+                        .doOnSuccess(response -> log.info("Successfully saved address"))
+                        .doOnError(error -> log.error("insert Fail")));
     }
 
     @Override
     @Observed(name = "find.byZipCode")
     public Mono<AddressResponse> findByZipCode(String zipCode) {
-        log.info("Start Method findByZipCode with zipCode: {}", zipCode);
-
         return repository.findByZip(zipCode)
+                .doFirst(() -> log.info("Start Method findByZipCode with zipCode: {}", zipCode))
                 .map(document -> mapper.toAddressResponse(document));
     }
 
     @Override
+    @Observed(name = "update.address")
     public Mono<AddressResponse> update(Mono<AddressRequest> request, String addressId) {
-        return request.flatMap(requestMap ->
-                repository.findById(addressId)
-                        .switchIfEmpty(Mono.error(new RuntimeException("Address not found for update")))
-                        .flatMap(document -> {
-                            document.setStreet(requestMap.getStreet());
-                            document.setNumber(requestMap.getNumber());
-                            document.setCity(requestMap.getCity());
-                            document.setState(requestMap.getState().getValue());
-                            document.setZip(requestMap.getZip());
-
-                            return repository.save(document);
-                        })
-                        .map(mapper::toAddressResponse)
-                        .onErrorResume(error -> Mono.error(new RuntimeException("Error during update", error)))
-        );
+        return request
+                .flatMap(requestMap ->
+                        repository.findById(addressId)
+                                .doFirst(() -> log.info("Start Method update with Address: {}", requestMap))
+                                .switchIfEmpty(Mono.error(new RuntimeException("Address not found for update")))
+                                .flatMap(document -> {
+                                    document.setStreet(requestMap.getStreet());
+                                    document.setNumber(requestMap.getNumber());
+                                    document.setCity(requestMap.getCity());
+                                    document.setState(requestMap.getState().getValue());
+                                    document.setZip(requestMap.getZip());
+                                    return repository.save(document)
+                                            .map(mapper::toAddressResponse);
+                                })
+                                .onErrorResume(error -> Mono.error(new RuntimeException("Error during update", error)))
+                                .doOnSuccess(response -> log.info("Update successfully performed! "))
+                                .doOnError(error -> log.error("Update Fail"))
+                );
     }
 
     @Override
+    @Observed(name = "delete.address")
     public Mono<Void> delete(String addressId) {
         return repository.findById(addressId)
+                .doFirst(() -> log.info("Start Method delete with AddressId: {}", addressId))
                 .flatMap(addressDocument -> repository.deleteById(addressId))
                 .onErrorResume(error -> Mono.error(new RuntimeException("Error during delete", error)));
+    }
+
+    private Mono<AddressDocument> toAddressDocument(ViaCpeModel documentModel) {
+        AddressDocument document = new AddressDocument();
+        document.setCity(documentModel.getLocalidade());
+        document.setStreet(documentModel.getLogradouro());
+        document.setState(documentModel.getUf());
+        document.setZip(documentModel.getCep());
+        document.setDistrict(documentModel.getBairro());
+        document.setIbgeId(documentModel.getIbge());
+        document.setNumber("");
+        return Mono.just(document);
     }
 }
