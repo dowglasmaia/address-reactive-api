@@ -8,9 +8,9 @@ info:
   version: 1.0.0
 tags:
   - name: Address
-    description: Operations related to client addresses
+  - name: External-Api
 paths:
-  /addresses/findByZipCode:
+  /addresses/find-by-zipcode:
     get:
       tags:
         - Address
@@ -137,6 +137,9 @@ components:
           type: string
           description: Street number
           example: 437
+        complement:
+          type: string
+          example: ""
         city:
           type: string
           description: City
@@ -146,10 +149,13 @@ components:
           description: State abbreviation
           enum: [AM, MA, SC, PR, PI]  # Definindo o campo state como um enum com opções específicas
           example: AM
+        neighborhood:
+          type: string
+          example: Center
         zip:
           type: string
           description: ZIP code
-          example: '94301'
+          example: '88111555'
     AddressResponse:
       type: object
       properties:
@@ -160,6 +166,9 @@ components:
           type: string
           description: Street address
           example: 437 Lytton Ave
+        neighborhood:
+          type: string
+          example: Center
         number:
           type: string
           description: Street number

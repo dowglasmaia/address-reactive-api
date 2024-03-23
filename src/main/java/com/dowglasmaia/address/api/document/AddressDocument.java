@@ -20,8 +20,7 @@ public class AddressDocument {
     private String number;
     private String city;
     private String state;
-    private String district;
-    private String ibgeId;
+    private String neighborhood;
 
     @Indexed(unique = true)
     private String zip;

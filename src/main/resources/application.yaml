@@ -13,7 +13,7 @@ spring:
 management:
   tracing:
     sampling:
-      probability: 1
+      probability: 1.0
   endpoints:
     enabled-by-default: false #desabilita o default do coletor
     web:
@@ -28,6 +28,12 @@ management:
       enabled: true
     prometheus:
       enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
 
 logging:
   file:

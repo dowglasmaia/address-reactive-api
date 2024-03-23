@@ -4,8 +4,6 @@ import br.com.dowglasmaia.openapi.model.AddressIdResponse;
 import br.com.dowglasmaia.openapi.model.AddressRequest;
 import br.com.dowglasmaia.openapi.model.AddressResponse;
 import com.dowglasmaia.address.api.document.AddressDocument;
-import com.dowglasmaia.address.api.integration.ViaCepApiIntegration;
-import com.dowglasmaia.address.api.integration.model.ViaCpeModel;
 import com.dowglasmaia.address.api.repository.AddressRepository;
 import com.dowglasmaia.address.api.service.AddressService;
 import com.dowglasmaia.address.api.service.mapper.AddressMapper;
@@ -23,20 +21,17 @@ public class AddressServiceImpl implements AddressService {
     @Autowired
     private AddressMapper mapper;
 
-    @Autowired
-    private ViaCepApiIntegration cepApiIntegration;
-
     @Override
     @Observed(name = "insert.address")
     public Mono<AddressIdResponse> insert(Mono<AddressRequest> request) {
         return request
                 .doFirst(() -> log.info("Start Method insert Address"))
-                .flatMap(addressRequest -> cepApiIntegration.getAddressByZipCode(addressRequest.getZip())
-                        .flatMap(this::toAddressDocument)
-                        .flatMap(repository::save)
-                        .map(savedDocument -> new AddressIdResponse().id(savedDocument.getId()))
-                        .doOnSuccess(response -> log.info("Successfully saved address"))
-                        .doOnError(error -> log.error("insert Fail")));
+                .flatMap(this::toAddressDocument)
+                .flatMap(repository::save)
+                .map(savedDocument -> new AddressIdResponse().id(savedDocument.getId()))
+                .doOnSuccess(response -> log.info("Successfully saved address"))
+                .doOnError(error -> log.error("insert Fail"))
+                .onErrorResume(error -> Mono.error(new RuntimeException("Error during insert", error)));
     }
 
     @Override
@@ -79,14 +74,13 @@ public class AddressServiceImpl implements AddressService {
                 .onErrorResume(error -> Mono.error(new RuntimeException("Error during delete", error)));
     }
 
-    private Mono<AddressDocument> toAddressDocument(ViaCpeModel documentModel) {
+    private Mono<AddressDocument> toAddressDocument(AddressRequest request) {
         AddressDocument document = new AddressDocument();
-        document.setCity(documentModel.getLocalidade());
-        document.setStreet(documentModel.getLogradouro());
-        document.setState(documentModel.getUf());
-        document.setZip(documentModel.getCep());
-        document.setDistrict(documentModel.getBairro());
-        document.setIbgeId(documentModel.getIbge());
+        document.setCity(request.getCity());
+        document.setStreet(request.getStreet());
+        document.setState(request.getState().getValue());
+        document.setZip(request.getZip());
+        document.setNeighborhood(request.getNeighborhood());
         document.setNumber("");
         return Mono.just(document);
     }
